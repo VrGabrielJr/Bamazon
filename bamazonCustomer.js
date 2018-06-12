@@ -1,5 +1,5 @@
 var mysql = require("mysql");
-var inquirer = require("inquirer");
+var inquirer = require('inquirer');
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -21,18 +21,30 @@ function afterConnection() {
 
     console.log("-------------------------------------------------------------");
     console.log("-----------------------ITEMS FOR SALE------------------------");
-    console.log("Item ID ---- Item Name ---- Department ---- Price ---- Stock");
     console.log("-------------------------------------------------------------");
-
     for(var i = 0; i < res.length; i++)
     {
-        console.log(res[i].item_id + " | " + 
-                    res[i].product_name + " | " + 
-                    res[i].department_name + " | " +
-                    res[i].price + " | " +
-                    res[i].stock_quantity);
+        console.log("ITEM ID: " + res[i].item_id + " | " + 
+                    "ITEM NAME: " + res[i].product_name + " | " + 
+                    "DEPARTMENT: " + res[i].department_name + " | " +
+                    "PRICE: " + res[i].price + " | " +
+                    "QUANTITY: " + res[i].stock_quantity);
         console.log("----------------------------------------------------")
     }
+
+    inquirer.prompt([
+
+        {
+          type: "input",
+          name: "id",
+          message: "What is the ID of the product they would like to buy?",
+        },
+        {
+          type: "input",
+          name: "units",
+          message: "How many units of the product they would like to buy?",
+        }
+    ]);
     
     connection.end();
   });
