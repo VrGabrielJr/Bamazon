@@ -11,12 +11,6 @@ var connection = mysql.createConnection({
   database: "bamazon"
 });
 
-connection.connect(function(err) {
-  if (err) throw err;
-  console.log("connected as id " + connection.threadId);
-  main();
-});
-
 function main() {
   display();
   prompt();
@@ -83,8 +77,21 @@ function prompt() {
       var id = inqRes.id;
       var units = inqRes.units;
 
-      console.log(id);
-      console.log(units);
-    })
-  }
-)}
+      connection.query(
+        "SELECT * FROM products WHERE ?",
+        {
+          item_id: id
+        },
+        function(err, resData) {
+          console.log(resData);
+        }
+      )
+    }
+  )
+}
+
+connection.connect(function(err) {
+  if (err) throw err;
+  console.log("connected as id " + connection.threadId);
+  main();
+});

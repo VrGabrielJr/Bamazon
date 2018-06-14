@@ -82,9 +82,42 @@ function prompt() {
     .then(function(inqRes) {
       var id = inqRes.id;
       var units = inqRes.units;
+      
+      connection.query("SELECT * FROM products WHERE ?", 
+        {
+          item_id: id
+        },
+        function(err, res) {
+          if (err) throw err;
 
-      console.log(id);
-      console.log(units);
+          var resInfo = res[0];
+          var resUnits = resInfo.stock_quantity;
+          
+          if (units < resUnits) {
+            var updateUnits = units;
+            var updateId = id;
+            connection.query("UPDATE products SET ? WHERE ?",
+              [
+                {
+                  stock_quantity: resUnits - updateUnits
+                },
+                {
+                  item_id: updateId
+                }
+              ],
+              function(err, res) {
+                console.log("Processing Your Order Now!");
+                console.log("Total Price = " + (updateUnits * resInfo.price));
+                console.log("Thank you come again!");
+              }
+            )
+          }
+          else {
+            console.log("\nInsufficent quantity!\n");
+          }
+        }
+    )
+
     })
   }
 )}
