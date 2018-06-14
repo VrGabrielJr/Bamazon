@@ -11,6 +11,12 @@ var connection = mysql.createConnection({
   database: "bamazon"
 });
 
+connection.connect(function(err) {
+  if (err) throw err;
+  console.log("connected as id " + connection.threadId);
+  main();
+});
+
 function main() {
   display();
   prompt();
@@ -76,22 +82,41 @@ function prompt() {
     .then(function(inqRes) {
       var id = inqRes.id;
       var units = inqRes.units;
-
-      connection.query(
-        "SELECT * FROM products WHERE ?",
+      
+      connection.query("SELECT * FROM products WHERE ?", 
         {
           item_id: id
         },
-        function(err, resData) {
-          console.log(resData);
+        function(err, res) {
+          if (err) throw err;
+
+          var resInfo = res[0];
+          var resUnits = resInfo.stock_quantity;
+          
+          if (units < resUnits) {
+            var updateUnits = units;
+            var updateId = id;
+            connection.query("UPDATE products SET ? WHERE ?",
+              [
+                {
+                  stock_quantity: resUnits - updateUnits
+                },
+                {
+                  item_id: updateId
+                }
+              ],
+              function(err, res) {
+                console.log("Processing Your Order Now!");
+                console.log("Total Price = " + (updateUnits * resInfo.price));
+                console.log("Thank you come again!");
+              }
+            )
+          }
+          else {
+            console.log("\nInsufficent quantity!\n");
+          }
         }
       )
     }
-  )
-}
-
-connection.connect(function(err) {
-  if (err) throw err;
-  console.log("connected as id " + connection.threadId);
-  main();
-});
+  )}
+)}

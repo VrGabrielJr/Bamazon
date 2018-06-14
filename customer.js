@@ -116,8 +116,7 @@ function prompt() {
             console.log("\nInsufficent quantity!\n");
           }
         }
-    )
-
-    })
-  }
+      )
+    }
+  )}
 )}
